@@ -1,0 +1,73 @@
+!pip install pandas matplotlib seaborn scikit-learnimport pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+# Sample data
+sample_data = {
+    'CustomerID': [1, 2, 3, 4, 5],
+    'InvoiceNo': [10, 12, 9, 15, 11],
+    'Quantity': [100, 150, 80, 200, 130],
+    'UnitPrice': [1.5, 2.0, 1.2, 1.8, 2.1]
+}
+data = pd.DataFrame(sample_data)
+data['TotalSpent'] = data['Quantity'] * data['UnitPrice']
+
+# Aggregate by customer
+customer_data = data.groupby('CustomerID').agg({
+    'InvoiceNo': 'nunique',
+    'Quantity': 'sum',
+    'TotalSpent': 'sum'
+}).rename(columns={
+    'InvoiceNo': 'NumPurchases',
+    'Quantity': 'TotalQuantity'
+}).reset_index()
+
+# Feature scaling
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(customer_data[['NumPurchases', 'TotalQuantity', 'TotalSpent']])
+
+# Elbow Method
+inertia = []
+K = range(1, 6)
+for k in K:
+    kmeans = KMeans(n_clusters=k, random_state=0)
+    kmeans.fit(scaled_data)
+    inertia.append(kmeans.inertia_)
+
+plt.figure(figsize=(8, 5))
+plt.plot(K, inertia, 'bo-')
+plt.xlabel('Number of clusters')
+plt.ylabel('Inertia')
+plt.title('Elbow Method For Optimal k')
+plt.show()
+
+# Apply K-Means with optimal k=3
+optimal_k = 3
+kmeans = KMeans(n_clusters=optimal_k, random_state=0)
+customer_data['Cluster'] = kmeans.fit_predict(scaled_data)
+
+# Visualization of clusters
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='TotalSpent', y='NumPurchases', hue='Cluster', data=customer_data, palette='viridis')
+plt.title('Customer Segmentation based on Spending and Purchase Frequency')
+plt.xlabel('Total Spent')
+plt.ylabel('Number of Purchases')
+plt.legend(title='Cluster')
+plt.show()
+
+# Silhouette Score
+silhouette_avg = silhouette_score(scaled_data, customer_data['Cluster'])
+print(f'Silhouette Score for k={optimal_k}: {silhouette_avg}')
+
+# Cluster Summary
+cluster_summary = customer_data.groupby('Cluster').agg({
+    'NumPurchases': 'mean',
+    'TotalQuantity': 'mean',
+    'TotalSpent': 'mean'
+}).round(2)
+
+print(cluster_summary)
