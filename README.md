@@ -6,6 +6,7 @@ DURIATION:SEPTEMBER TO NOVEMBER 2024,
 MENTOR:NEELA SANTHOSH KUMAR
 
 overview of the project: CUSTOMER SEGMENTATION AND ANALYSIS
+
 Objective:
 The goal is to segment a retail customer base by grouping customers based on their purchase behavior, preferences, and shopping habits.
 This segmentation helps in identifying clusters or groups that exhibit similar behaviors, allowing the company to tailor marketing strategies, offers, and services to each group.
