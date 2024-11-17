@@ -1,4 +1,5 @@
-!pip install pandas matplotlib seaborn scikit-learnimport pandas as pd
+!pip install pandas matplotlib seaborn scikit-learn
+import pandas as pd #This was on the previous line with !pip install ...
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
